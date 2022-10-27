@@ -1,9 +1,14 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Formik, Form, Field } from "formik";
 import database from "../app/db.json";
+import { CriptoContext } from "../CriptoProvider/CriptoProvider";
+import Respuesta from "./Respuesta";
+import Spinner from "./Spinner";
 
 const Formulario = () => {
-  console.log(database);
+  const { monedas: monedasArr } = database;
+  const { criptomonedas, submitCotizar, respuesta, spinner, setRespuesta } =
+    useContext(CriptoContext);
   return (
     <section className="w-1/2">
       <h3 className="text-3xl text-white font-black text-center py-2 border-b-2 border-white ">
@@ -16,7 +21,8 @@ const Formulario = () => {
           criptomoneda: "",
         }}
         onSubmit={(values) => {
-          console.log("Hola", values);
+          setRespuesta({});
+          submitCotizar(values.moneda, values.criptomoneda);
         }}
       >
         <Form className="px-2 mt-7">
@@ -27,14 +33,21 @@ const Formulario = () => {
             Elige tu moneda
           </label>
           <Field
+            required
             as="select"
             name="moneda"
             id="moneda"
             className="mb-7 block py-2 px-4 w-full rounded-sm text-gray-700 font-semibold"
           >
-            <option value="red">Red</option>
-            <option value="green">Green</option>
-            <option value="blue">Blue</option>
+            <option value="">--Seleccione--</option>
+
+            {monedasArr?.map((moneda) => {
+              return (
+                <option key={moneda.id} value={moneda.id}>
+                  {moneda.nombre}
+                </option>
+              );
+            })}
           </Field>
 
           <label
@@ -44,14 +57,21 @@ const Formulario = () => {
             Elige la cripotomoneda:{" "}
           </label>
           <Field
+            required
             as="select"
             name="criptomoneda"
             id="criptomoneda"
             className="mb-7 block py-2 px-4 w-full rounded-sm text-gray-700 font-semibold"
           >
-            <option value="red">Red</option>
-            <option value="green">Green</option>
-            <option value="blue">Blue</option>
+            <option value="">--Seleccione--</option>
+
+            {criptomonedas.map((cripto) => {
+              return (
+                <option key={cripto.Id} value={cripto.Name}>
+                  {cripto.FullName}
+                </option>
+              );
+            })}
           </Field>
           <button
             type="submit"
@@ -61,6 +81,9 @@ const Formulario = () => {
           </button>
         </Form>
       </Formik>
+
+      {respuesta?.CHANGE24HOUR ? <Respuesta /> : null}
+      {spinner ? <Spinner /> : null}
     </section>
   );
 };
